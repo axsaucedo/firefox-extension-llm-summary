@@ -3,7 +3,7 @@ class OptionsController {
     constructor() {
         this.defaultSettings = {
             apiUrl: 'http://localhost:4000/v1/chat/completions',
-            model: 'gpt-4o',
+            model: 'openai/gpt-4o',
             headers: {},
             defaultSummaryPrompt: 'Please provide a concise summary of the following content:',
             requestTimeout: 30,

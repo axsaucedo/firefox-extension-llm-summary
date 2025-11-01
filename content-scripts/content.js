@@ -3,18 +3,50 @@
 
 class ContentExtractor {
     constructor() {
+        this.lastSelection = '';
         this.setupMessageListener();
+        this.setupSelectionTracking();
     }
 
     setupMessageListener() {
         // Listen for messages from the popup
         browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (message.action === 'getContent') {
+                console.log('DEBUG: Received getContent message, type:', message.type);
                 const content = this.extractContent(message.type);
+                console.log('DEBUG: Extracted content length:', content.length);
                 sendResponse({ content: content });
                 return true; // Keep message channel open for async response
             }
         });
+    }
+
+    setupSelectionTracking() {
+        // Listen for selection changes and cache valid selections
+        document.addEventListener('selectionchange', () => {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const selectedText = selection.toString().trim();
+                if (selectedText) {
+                    this.lastSelection = selectedText;
+                    console.log('DEBUG: Cached new selection:', selectedText.substring(0, 50) + '...');
+                }
+            }
+        });
+
+        // Also capture selection on mouseup (as backup)
+        document.addEventListener('mouseup', () => {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                const selectedText = selection.toString().trim();
+                if (selectedText) {
+                    this.lastSelection = selectedText;
+                    console.log('DEBUG: Mouseup - cached selection:', selectedText.substring(0, 50) + '...');
+                }
+            }, 10); // Small delay to ensure selection is complete
+        });
+
+        console.log('DEBUG: Selection tracking initialized');
     }
 
     extractContent(type) {
@@ -35,19 +67,35 @@ class ContentExtractor {
 
     getSelectedText() {
         const selection = window.getSelection();
-        if (selection.rangeCount === 0) {
-            return '';
+        console.log('DEBUG: getSelectedText called, rangeCount:', selection.rangeCount);
+
+        let selectedText = '';
+
+        if (selection.rangeCount > 0) {
+            selectedText = selection.toString().trim();
+            console.log('DEBUG: Current selection text length:', selectedText.length);
+            console.log('DEBUG: Current selection preview:', selectedText.substring(0, 50) + '...');
         }
 
-        let selectedText = selection.toString().trim();
+        // If no current selection but we have cached selection, use it
+        if (!selectedText && this.lastSelection) {
+            selectedText = this.lastSelection;
+            console.log('DEBUG: Using cached selection, length:', selectedText.length);
+            console.log('DEBUG: Cached selection preview:', selectedText.substring(0, 50) + '...');
+            // Clear the cache after using it
+            this.lastSelection = '';
+        }
 
-        // If no text is selected, return empty string
+        // If still no text, return empty string
         if (!selectedText) {
+            console.log('DEBUG: No text selected and no cached selection available');
             return '';
         }
 
         // Clean up the text
-        return this.cleanText(selectedText);
+        const cleanedText = this.cleanText(selectedText);
+        console.log('DEBUG: Final cleaned text length:', cleanedText.length);
+        return cleanedText;
     }
 
     getPageContent() {

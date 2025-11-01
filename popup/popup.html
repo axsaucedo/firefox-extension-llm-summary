@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Utilities</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>LLM Utilities</h1>
+        </header>
+
+        <!-- Main Menu View -->
+        <div id="main-view" class="view active">
+            <div class="modules-grid">
+                <button class="module-button" id="summarise-button" data-module="summarise">
+                    <div class="module-icon">📝</div>
+                    <div class="module-title">Summarise</div>
+                </button>
+                <button class="module-button" id="options-button" data-module="options">
+                    <div class="module-icon">⚙️</div>
+                    <div class="module-title">Options</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Summarise Module View -->
+        <div id="summarise-view" class="view">
+            <div class="view-header">
+                <button class="back-button" id="back-from-summarise">←</button>
+                <h2>Summarise Content</h2>
+            </div>
+
+            <div class="content-selection">
+                <label class="radio-group">
+                    <input type="radio" name="content-type" value="selected" id="selected-content" checked>
+                    <span>Selected Text</span>
+                </label>
+                <label class="radio-group">
+                    <input type="radio" name="content-type" value="page" id="page-content">
+                    <span>Full Page</span>
+                </label>
+            </div>
+
+            <div class="prompt-section">
+                <label for="prompt-input">Custom Prompt:</label>
+                <textarea
+                    id="prompt-input"
+                    placeholder="Please provide a concise summary of the following content:"
+                    rows="3"
+                ></textarea>
+            </div>
+
+            <button id="summarise-action" class="action-button">
+                <span class="button-text">Summarise</span>
+                <span class="loading-spinner" style="display: none;">⏳</span>
+            </button>
+
+            <div id="summary-output" class="output-section" style="display: none;">
+                <div class="output-header">
+                    <h3>Summary</h3>
+                    <button id="copy-summary" class="copy-button">📋 Copy</button>
+                </div>
+                <div id="summary-text" class="output-text"></div>
+                <div id="error-message" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Options Module View -->
+        <div id="options-view" class="view">
+            <div class="view-header">
+                <button class="back-button" id="back-from-options">←</button>
+                <h2>Settings</h2>
+            </div>
+
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="api-url">API Endpoint:</label>
+                    <input
+                        type="url"
+                        id="api-url"
+                        placeholder="http://localhost:4000/v1/chat/completions"
+                        value="http://localhost:4000/v1/chat/completions"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="model-name">Model:</label>
+                    <input
+                        type="text"
+                        id="model-name"
+                        placeholder="gpt-4o"
+                        value="gpt-4o"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="api-headers">Custom Headers (JSON):</label>
+                    <textarea
+                        id="api-headers"
+                        placeholder='{"Authorization": "Bearer your-token"}'
+                        rows="3"
+                    ></textarea>
+                </div>
+
+                <button id="save-settings" class="action-button">Save Settings</button>
+                <div id="settings-status" class="status-message" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

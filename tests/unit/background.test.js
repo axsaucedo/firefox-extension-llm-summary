@@ -29,7 +29,7 @@ describe('BackgroundManager', () => {
             expect(browser.storage.sync.set).toHaveBeenCalledWith({
                 llmSettings: expect.objectContaining({
                     apiUrl: 'http://localhost:4000/v1/chat/completions',
-                    model: 'gpt-4o'
+                    model: 'openai/gpt-4o'
                 }),
                 savedPrompt: 'Please provide a concise summary of the following content:'
             });
@@ -283,7 +283,7 @@ describe('BackgroundManager', () => {
             expect(browser.storage.sync.set).toHaveBeenCalledWith({
                 llmSettings: expect.objectContaining({
                     apiUrl: 'http://localhost:4000/v1/chat/completions',
-                    model: 'gpt-4o'
+                    model: 'openai/gpt-4o'
                 }),
                 savedPrompt: 'Please provide a concise summary of the following content:'
             });

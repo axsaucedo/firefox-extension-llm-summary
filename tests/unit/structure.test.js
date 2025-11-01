@@ -93,7 +93,7 @@ describe('Utility Functions', () => {
         expect(settings).toHaveProperty('model');
         expect(settings).toHaveProperty('headers');
         expect(settings.apiUrl).toContain('localhost');
-        expect(settings.model).toBe('gpt-4o');
+        expect(settings.model).toBe('openai/gpt-4o');
     });
 
     test('createMockSettings should allow overrides', () => {

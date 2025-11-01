@@ -55,7 +55,7 @@ A Firefox browser extension that provides utilities for LLM (Large Language Mode
 2. **Click "Options"** to open the settings page
 3. **Configure your API settings:**
    - **API Endpoint**: Your LLM API URL (e.g., `http://localhost:4000/v1/chat/completions`)
-   - **Model**: The model name to use (e.g., `gpt-4o`, `claude-3-sonnet`)
+   - **Model**: The model name to use (e.g., `openai/gpt-4o`, `claude-3-sonnet`)
    - **Custom Headers**: JSON object with authentication headers if needed
 
 ### Example API Configuration
@@ -63,7 +63,7 @@ A Firefox browser extension that provides utilities for LLM (Large Language Mode
 For a local OpenAI-compatible API:
 ```json
 API Endpoint: http://localhost:4000/v1/chat/completions
-Model: gpt-4o
+Model: openai/gpt-4o
 Headers: {
   "Authorization": "Bearer your-api-key",
   "Content-Type": "application/json"
@@ -302,7 +302,7 @@ POST /v1/chat/completions
 Content-Type: application/json
 
 {
-  "model": "gpt-4o",
+  "model": "openai/gpt-4o",
   "messages": [
     {
       "role": "user",

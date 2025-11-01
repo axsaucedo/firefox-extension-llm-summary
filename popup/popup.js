@@ -4,7 +4,7 @@ class PopupController {
         this.currentView = 'main';
         this.settings = {
             apiUrl: 'http://localhost:4000/v1/chat/completions',
-            model: 'gpt-4o',
+            model: 'openai/gpt-4o',
             headers: {}
         };
         this.initializeElements();

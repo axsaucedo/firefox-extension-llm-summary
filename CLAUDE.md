@@ -189,7 +189,53 @@ uv run llm-proxy serve https://api.anthropic.com --port 4000
 ### Common API Configurations
 - **With LLM Proxy**: `http://localhost:4000/v1/chat/completions` (proxy handles auth)
 - **Direct APIs**: `https://api.openai.com/v1/chat/completions` (requires auth headers)
-- **Model names**: `gpt-4o`, `claude-3-sonnet`, or custom model identifiers
+- **Model names**: `openai/gpt-4o`, `claude-3-sonnet`, or custom model identifiers
+
+## Git Commit Requirements
+
+**CRITICAL**: This is an active git repository. Every modification must include detailed git commits:
+
+### Commit Guidelines
+- **Always commit changes** after completing logical units of work
+- **Detailed commit messages** explaining what was changed and why
+- **Separate commits** for different types of changes (features, fixes, documentation)
+- **Include file-specific details** in commit messages
+
+### Commit Message Format
+```
+<type>: <short description>
+
+- Detailed explanation of what was changed
+- Why the change was necessary
+- Any breaking changes or considerations
+- Files modified: path/to/file1.js, path/to/file2.css
+```
+
+### Example Commits
+```bash
+git add popup/popup.js popup/popup.css
+git commit -m "feat: add dark mode toggle to popup interface
+
+- Added dark mode state management in PopupController
+- Updated CSS with dark theme variables and transitions
+- Added toggle button in main view with localStorage persistence
+- Files modified: popup/popup.js, popup/popup.css"
+
+git add llm-proxy/llm_proxy.py
+git commit -m "fix: resolve global variable scope issue in proxy
+
+- Added explicit global declarations for TARGET_URL and TOKEN
+- Fixes proxy configuration not being accessible to request handler
+- Ensures authentication headers are properly added to requests
+- Files modified: llm-proxy/llm_proxy.py"
+```
+
+### When to Commit
+- After implementing a complete feature
+- After fixing bugs or issues
+- After updating documentation
+- Before major refactoring
+- When requested by user for specific changes
 
 ## Manual Testing Workflow
 

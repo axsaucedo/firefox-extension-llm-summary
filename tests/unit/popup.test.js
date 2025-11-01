@@ -29,7 +29,7 @@ describe('PopupController', () => {
                 <div id="error-message" style="display: none;"></div>
             </div>
             <input id="api-url" value="http://localhost:4000/v1/chat/completions">
-            <input id="model-name" value="gpt-4o">
+            <input id="model-name" value="openai/gpt-4o">
             <textarea id="api-headers">{}</textarea>
             <button id="save-settings"></button>
             <div id="settings-status" style="display: none;"></div>
@@ -47,7 +47,7 @@ describe('PopupController', () => {
             expect(popupController.currentView).toBe('main');
             expect(popupController.settings).toMatchObject({
                 apiUrl: 'http://localhost:4000/v1/chat/completions',
-                model: 'gpt-4o',
+                model: 'openai/gpt-4o',
                 headers: {}
             });
         });

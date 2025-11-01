@@ -99,38 +99,80 @@ class ContentExtractor {
     }
 
     getPageContent() {
-        // Try to get content from common article containers first
-        const articleSelectors = [
-            'article',
-            '[role="main"]',
-            'main',
-            '.content',
-            '.post-content',
-            '.entry-content',
-            '.article-content',
-            '.story-body',
-            '.post-body'
+        console.log('DEBUG: Starting enhanced page content extraction');
+
+        // Layer 1: Enhanced semantic HTML detection with priority scoring
+        const semanticSelectors = [
+            // High priority semantic selectors
+            { selector: 'main[role="main"]', priority: 100 },
+            { selector: 'article', priority: 95 },
+            { selector: '[role="main"]', priority: 90 },
+            { selector: 'main', priority: 85 },
+
+            // Academic and research site patterns
+            { selector: '.container .content', priority: 80 },
+            { selector: '.page-content', priority: 75 },
+            { selector: '.post-content', priority: 75 },
+            { selector: '.entry-content', priority: 75 },
+            { selector: '.article-content', priority: 75 },
+            { selector: '.story-body', priority: 70 },
+            { selector: '.post-body', priority: 70 },
+
+            // Documentation and blog patterns
+            { selector: '.markdown-body', priority: 80 },
+            { selector: '.prose', priority: 75 },
+            { selector: '.content-area', priority: 70 },
+            { selector: '.main-content', priority: 70 },
+            { selector: '.primary-content', priority: 70 },
+
+            // Generic content patterns
+            { selector: '.content', priority: 60 },
+            { selector: '#content', priority: 60 },
+            { selector: '#main', priority: 55 },
+            { selector: '.wrapper .content', priority: 50 },
+            { selector: '.container', priority: 40 }
         ];
 
-        let content = '';
-
-        // Try to find article content first
-        for (const selector of articleSelectors) {
+        // Try semantic selectors first
+        for (const { selector, priority } of semanticSelectors) {
             const element = document.querySelector(selector);
             if (element) {
-                content = this.extractTextFromElement(element);
-                if (content && content.length > 100) { // Minimum content length
+                console.log(`DEBUG: Trying selector "${selector}" with priority ${priority}`);
+                const content = this.extractTextFromElement(element);
+                const contentScore = this.scoreContent(element, content);
+
+                console.log(`DEBUG: Content length: ${content.length}, Score: ${contentScore}`);
+
+                // Lower threshold for high-priority selectors, higher for generic ones
+                const threshold = priority > 70 ? 50 : 100;
+
+                if (content && content.length > threshold && contentScore > 0.3) {
+                    console.log(`DEBUG: Using content from "${selector}"`);
                     return this.cleanText(content);
                 }
             }
         }
 
-        // If no article content found, extract from body but exclude common navigation/footer elements
-        if (!content) {
-            content = this.extractBodyContent();
+        // Layer 2: Heuristic content detection using content density analysis
+        console.log('DEBUG: Falling back to heuristic content detection');
+        const heuristicContent = this.findContentByHeuristics();
+        if (heuristicContent && heuristicContent.length > 100) {
+            console.log('DEBUG: Using heuristic-detected content');
+            return this.cleanText(heuristicContent);
         }
 
-        return this.cleanText(content);
+        // Layer 3: Intelligent content scoring of all elements
+        console.log('DEBUG: Falling back to content scoring analysis');
+        const scoredContent = this.findContentByScoring();
+        if (scoredContent && scoredContent.length > 100) {
+            console.log('DEBUG: Using scored content');
+            return this.cleanText(scoredContent);
+        }
+
+        // Layer 4: Enhanced body extraction as final fallback
+        console.log('DEBUG: Using enhanced body extraction as final fallback');
+        const bodyContent = this.extractBodyContent();
+        return this.cleanText(bodyContent);
     }
 
     extractTextFromElement(element) {
@@ -201,6 +243,136 @@ class ContentExtractor {
         });
 
         return body.textContent || body.innerText || '';
+    }
+
+    // Content scoring algorithm inspired by readability heuristics
+    scoreContent(element, text) {
+        if (!element || !text) return 0;
+
+        let score = 0;
+        const textLength = text.length;
+
+        // Base score from text length (normalized)
+        score += Math.min(textLength / 1000, 1) * 0.3;
+
+        // Calculate text density (text vs markup ratio)
+        const htmlLength = element.innerHTML.length;
+        const textDensity = htmlLength > 0 ? textLength / htmlLength : 0;
+        score += textDensity * 0.3;
+
+        // Count paragraphs and text blocks
+        const paragraphs = element.querySelectorAll('p, div, section, article').length;
+        const paragraphScore = Math.min(paragraphs / 10, 1) * 0.2;
+        score += paragraphScore;
+
+        // Penalty for high link density (likely navigation)
+        const links = element.querySelectorAll('a').length;
+        const linkDensity = textLength > 0 ? links / (textLength / 100) : 0;
+        score -= Math.min(linkDensity * 0.2, 0.3);
+
+        // Bonus for content indicators
+        const contentIndicators = ['time', 'author', 'byline', 'published', 'article', 'content'];
+        const classNames = element.className.toLowerCase();
+        const hasContentIndicators = contentIndicators.some(indicator =>
+            classNames.includes(indicator) || element.id.toLowerCase().includes(indicator)
+        );
+        if (hasContentIndicators) score += 0.1;
+
+        // Bonus for semantic elements
+        if (['ARTICLE', 'MAIN', 'SECTION'].includes(element.tagName)) {
+            score += 0.15;
+        }
+
+        console.log(`DEBUG: Element score breakdown - Length: ${textLength}, Density: ${textDensity.toFixed(2)}, Paragraphs: ${paragraphs}, Links: ${links}, Final score: ${score.toFixed(2)}`);
+
+        return Math.max(0, Math.min(score, 1)); // Clamp between 0 and 1
+    }
+
+    // Heuristic content detection using content density analysis
+    findContentByHeuristics() {
+        console.log('DEBUG: Starting heuristic content detection');
+
+        const candidates = [];
+
+        // Find all potential content containers
+        const potentialContainers = document.querySelectorAll('div, section, article, main, aside');
+
+        for (const container of potentialContainers) {
+            const text = this.extractTextFromElement(container);
+            if (text.length < 50) continue; // Skip very short content
+
+            const score = this.scoreContent(container, text);
+            if (score > 0.2) { // Minimum score threshold
+                candidates.push({ element: container, text, score });
+            }
+        }
+
+        // Sort by score and return the best candidate
+        candidates.sort((a, b) => b.score - a.score);
+
+        if (candidates.length > 0) {
+            console.log(`DEBUG: Found ${candidates.length} candidates, best score: ${candidates[0].score.toFixed(2)}`);
+            return candidates[0].text;
+        }
+
+        return '';
+    }
+
+    // Advanced content scoring by analyzing all elements
+    findContentByScoring() {
+        console.log('DEBUG: Starting comprehensive content scoring');
+
+        let bestElement = null;
+        let bestScore = 0;
+        let bestContent = '';
+
+        // Analyze all significant elements
+        const allElements = document.querySelectorAll('div, section, article, main, aside, body > *');
+
+        for (const element of allElements) {
+            // Skip obviously non-content elements
+            if (this.isNonContentElement(element)) continue;
+
+            const text = this.extractTextFromElement(element);
+            if (text.length < 100) continue; // Minimum content threshold
+
+            const score = this.scoreContent(element, text);
+
+            if (score > bestScore && score > 0.4) { // Higher threshold for this method
+                bestScore = score;
+                bestElement = element;
+                bestContent = text;
+            }
+        }
+
+        if (bestElement) {
+            console.log(`DEBUG: Best scored element: ${bestElement.tagName}.${bestElement.className}, score: ${bestScore.toFixed(2)}`);
+            return bestContent;
+        }
+
+        return '';
+    }
+
+    // Helper method to identify non-content elements
+    isNonContentElement(element) {
+        const tagName = element.tagName.toLowerCase();
+        const className = element.className.toLowerCase();
+        const id = element.id.toLowerCase();
+
+        // Skip obvious non-content elements
+        const nonContentTags = ['nav', 'header', 'footer', 'aside', 'form', 'button'];
+        if (nonContentTags.includes(tagName)) return true;
+
+        // Skip elements with non-content class names or IDs
+        const nonContentPatterns = [
+            'nav', 'menu', 'sidebar', 'header', 'footer', 'ad', 'advertisement',
+            'social', 'share', 'comment', 'widget', 'popup', 'modal', 'overlay',
+            'breadcrumb', 'pagination', 'search', 'filter', 'toolbar'
+        ];
+
+        return nonContentPatterns.some(pattern =>
+            className.includes(pattern) || id.includes(pattern)
+        );
     }
 
     cleanText(text) {

@@ -70,6 +70,26 @@ Headers: {
 }
 ```
 
+### Using the LLM Proxy (for zign authentication)
+
+This repository includes an `llm-proxy` component for environments that use zign for authentication:
+
+1. **Start the proxy**:
+   ```bash
+   cd llm-proxy
+   uv sync
+   uv run llm-proxy serve https://api.anthropic.com --port 4000
+   ```
+
+2. **Configure extension**:
+   ```json
+   API Endpoint: http://localhost:4000/v1/chat/completions
+   Model: claude-3-sonnet-20240229
+   Headers: {} (leave empty - proxy handles auth)
+   ```
+
+The proxy automatically extracts zign tokens and adds them to requests before forwarding to the target API.
+
 ## Usage
 
 ### Basic Summarization

@@ -170,9 +170,25 @@ Content-Type: application/json
 { "model": "...", "messages": [...] }
 ```
 
+### LLM Proxy Component
+The repository includes an `llm-proxy/` component - a Python HTTP proxy that adds zign authentication headers:
+
+**Purpose**: Enables authentication with external LLM APIs that require tokens extracted via `zign.api.get_token()`
+
+**Usage**:
+```bash
+cd llm-proxy
+uv sync
+uv run llm-proxy serve https://api.anthropic.com --port 4000
+```
+
+**Extension Configuration**: Set API endpoint to `http://localhost:4000/v1/chat/completions`
+
+**Architecture**: FastAPI + httpx async proxy with token caching and transparent request forwarding
+
 ### Common API Configurations
-- **Local OpenAI-compatible**: `http://localhost:4000/v1/chat/completions`
-- **Authentication**: Set via Custom Headers in options page
+- **With LLM Proxy**: `http://localhost:4000/v1/chat/completions` (proxy handles auth)
+- **Direct APIs**: `https://api.openai.com/v1/chat/completions` (requires auth headers)
 - **Model names**: `gpt-4o`, `claude-3-sonnet`, or custom model identifiers
 
 ## Manual Testing Workflow

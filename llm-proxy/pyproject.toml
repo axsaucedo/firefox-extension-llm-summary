@@ -1,0 +1,19 @@
+[project]
+name = "llm-proxy"
+version = "0.1.0"
+description = "Simple HTTP proxy that adds authentication headers"
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi>=0.104.0",
+    "httpx>=0.25.0",
+    "typer>=0.9.0",
+    "httpie-zign>=0.2",
+    "uvicorn>=0.24.0",
+]
+
+[project.scripts]
+llm-proxy = "llm_proxy:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

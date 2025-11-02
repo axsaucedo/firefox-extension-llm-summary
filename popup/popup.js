@@ -52,11 +52,12 @@ async function summarize() {
             })
         });
 
+        const data = await apiResponse.json();
+
         if (!apiResponse.ok) {
-            throw new Error(`API error: ${apiResponse.status}`);
+            throw new Error(`API error ${apiResponse.status}: ${JSON.stringify(data)}`);
         }
 
-        const data = await apiResponse.json();
         const summary = data.choices?.[0]?.message?.content || 'No summary generated';
         resultDiv.textContent = summary;
 

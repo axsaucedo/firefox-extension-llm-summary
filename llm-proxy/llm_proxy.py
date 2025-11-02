@@ -50,6 +50,7 @@ async def proxy_request(request: Request, path: str):
                 url=target,
                 headers=headers,
                 content=body,
+                timeout=100,
             )
             print(f"Response: {response.status_code} | Content: {response.content[:1000] if response.content else 'None'}")
             return Response(
@@ -57,9 +58,9 @@ async def proxy_request(request: Request, path: str):
                 status_code=response.status_code,
                 headers=dict(response.headers),
             )
-        except Exception:
+        except Exception as e:
             traceback.print_exc()
-            return Response(f"Proxy error: {traceback.format_exc()}", status_code=502)
+            return Response(f"Proxy error: {e}", status_code=502)
 
 
 def main(

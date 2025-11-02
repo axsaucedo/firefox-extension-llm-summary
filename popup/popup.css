@@ -1,310 +1,62 @@
-/* Reset and base styles */
-* {
+body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
-    color: #333;
-    background: #f8f9fa;
 }
 
 .container {
-    width: 380px;
-    min-height: 400px;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    padding: 16px;
 }
 
-/* Header */
-.header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 16px 20px;
+h3 {
+    margin: 0 0 16px 0;
     text-align: center;
 }
 
-.header h1 {
-    font-size: 18px;
-    font-weight: 600;
-}
-
-/* Views */
-.view {
-    display: none;
-    padding: 20px;
-}
-
-.view.active {
-    display: block;
-}
-
-.view-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 12px;
-}
-
-.back-button {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.back-button:hover {
-    background-color: #f0f0f0;
-}
-
-.view-header h2 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-}
-
-/* Main modules grid */
-.modules-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    padding: 10px 0;
-}
-
-.module-button {
-    background: white;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    padding: 24px 16px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    min-height: 120px;
-}
-
-.module-button:hover {
-    border-color: #667eea;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-}
-
-.module-icon {
-    font-size: 32px;
-    line-height: 1;
-}
-
-.module-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-}
-
-/* Content selection */
-.content-selection {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    padding: 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.radio-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.radio-group input[type="radio"] {
-    margin: 0;
-}
-
-/* Form elements */
-.prompt-section, .form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label, .prompt-section label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    font-size: 13px;
-    color: #495057;
-}
-
-.form-group input, .prompt-section textarea, .form-group textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    font-size: 13px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-group input:focus, .prompt-section textarea:focus, .form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.prompt-section textarea {
-    resize: vertical;
-    min-height: 60px;
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-    font-family: monospace;
-}
-
-/* Buttons */
-.action-button {
-    width: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.action-button:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.action-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.loading-spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Output section */
-.output-section {
-    margin-top: 20px;
-    padding: 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.output-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.content-type {
     margin-bottom: 12px;
 }
 
-.output-header h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
+.content-type label {
+    display: block;
+    margin-bottom: 4px;
 }
 
-.copy-button {
-    background: #28a745;
-    color: white;
+#prompt {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+#summarize-btn, #options-btn {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
     border: none;
-    padding: 6px 12px;
     border-radius: 4px;
-    font-size: 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
 }
 
-.copy-button:hover {
-    background: #218838;
+#summarize-btn {
+    background: #007cba;
+    color: white;
 }
 
-.output-text {
-    font-size: 13px;
-    line-height: 1.5;
-    color: #495057;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    max-height: 200px;
-    overflow-y: auto;
+#options-btn {
+    background: #666;
+    color: white;
 }
 
-/* Messages */
-.error-message {
-    background: #f8d7da;
-    color: #721c24;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    margin-top: 8px;
-}
-
-.status-message {
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 12px;
+.result {
     margin-top: 12px;
-}
-
-.status-message.success {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-message.error {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* Settings form */
-.settings-form {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-/* Scrollbar styling */
-.output-text::-webkit-scrollbar, .settings-form::-webkit-scrollbar {
-    width: 6px;
-}
-
-.output-text::-webkit-scrollbar-track, .settings-form::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.output-text::-webkit-scrollbar-thumb, .settings-form::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-.output-text::-webkit-scrollbar-thumb:hover, .settings-form::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 60px;
+    white-space: pre-wrap;
 }

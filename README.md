@@ -7,7 +7,7 @@ A minimal Firefox browser extension for LLM text summarization. Simple, function
 - **Auto-Detection**: Automatically detects selected text or uses full page content
 - **Single-Click Summarization**: One button to summarize any content
 - **Minimal Configuration**: Just API URL, model, and timeout settings
-- **LLM Proxy Support**: Includes simple proxy for zign authentication
+- **LLM Proxy Support**: Includes simple proxy to handle LLM authentication.
 - **Zero Complexity**: No view management, no over-engineering
 
 ## Installation
@@ -38,8 +38,6 @@ A minimal Firefox browser extension for LLM text summarization. Simple, function
 
 ### Using the LLM Proxy
 
-For zign authentication environments:
-
 ```bash
 cd llm-proxy
 uv sync
@@ -56,31 +54,29 @@ Set extension API URL to `http://localhost:4000/v1/chat/completions`
 4. **Optional**: Edit prompt
 5. **Click "Summarize"**
 
-That's it. The extension intelligently uses selected text if available, otherwise uses full page content.
+The extension uses selected text if available, otherwise uses full page content.
 
 ## Architecture
 
-**Philosophy**: Maximum simplicity, minimum code complexity.
-
-### File Structure (150 total lines)
+### File Structure
 ```
 popup/
-├── popup.js      (68 lines) - Simple functions, no classes
-├── popup.html    (21 lines) - Single view, no navigation
-└── popup.css     (52 lines) - Essential styles only
+├── popup.js      - Simple functions, no classes
+├── popup.html    - Single view, no navigation
+└── popup.css     - Essential styles only
 
 content-scripts/
-└── content.js    (16 lines) - Auto-detect selection vs full page
+└── content.js    - Auto-detect selection vs full page
 
 background/
-└── background.js (22 lines) - Basic context menu only
+└── background.js - Basic context menu only
 
 options/
-├── options.js    (41 lines) - Minimal 3-field settings
-└── options.html  (31 lines) - Basic form
+├── options.js    - Minimal 3-field settings
+└── options.html  - Basic form
 
 llm-proxy/
-└── llm_proxy.py  (87 lines) - Simple authentication proxy
+└── llm_proxy.py  - Simple authentication proxy
 ```
 
 ### Simplification Achieved
@@ -121,16 +117,6 @@ POST /v1/chat/completions
 3. **Network issues**: Check proxy/firewall settings
 4. **Debug**: Use browser console (F12) and llm-proxy logs
 
-## Design Philosophy
-
-This extension follows the **llm-proxy principle**:
-- Simple over complex
-- Functional over fancy
-- Minimal viable product over feature-rich
-- Let the LLM do the work instead of complex code
-
-**Key insight**: Modern LLMs are smart enough to filter noisy content, eliminating the need for complex content extraction algorithms.
-
 ## License
 
-MIT License - Simple and permissive, just like the code.
+MIT License

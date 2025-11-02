@@ -4,13 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## KEEP IT SIMPLE Philosophy
 
-**CRITICAL**: This codebase follows a radical simplification philosophy. When users request changes with phrases like "KEEP IT SIMPLE", "minimal", "simple", or similar language, they are explicitly requesting:
-
-1. **Minimal Code Changes**: Add only 1-2 lines of code maximum
-2. **No Over-Engineering**: Avoid complex algorithms, classes, or elaborate solutions
-3. **Function-Based Approach**: Use simple functions, not classes or frameworks
-4. **Minimal UI Changes**: Basic functionality over fancy interfaces
-5. **LLM-Proxy Principle**: Follow the same simplicity as llm_proxy.py (87 lines total)
+**CRITICAL**: This codebase follows a radical simplification philosophy. When users request changes ensure that by default it is assumed to make changes in ways that are simple, without over-engineering, and without trying to overcomplicate the codebase with elaborate classes or patterns, unless explicitly requested / required and defined in a plan.
 
 ### Examples of KEEP IT SIMPLE:
 - **Good**: `print(f"Debug: {data}")` (1 line)
@@ -22,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Good**: Three input fields for settings
 - **Bad**: Comprehensive settings management with import/export, validation, categories
 
-**Remember**: The entire extension was reduced from 1,597 lines to 150 lines. Maintain this simplicity.
+**Remember**: The entire codebase was reduced from 1,597 lines to 150 lines. Maintain this simplicity. The llm-proxy is a good example (87 lines); readable and simple as just a utility, but still well designed code and complexity can increase only if / when required.
 
 ## Development Commands
 
@@ -209,30 +203,9 @@ system that handles modern web architectures and diverse site structures.
 [... 50 lines of explanation ...]
 ```
 
-### When to Use Bullet Points
-Only when multiple distinct changes are made:
-```
-feat: simplify popup interface
-
-- Remove radio buttons from HTML
-- Update CSS to remove radio styles
-- Add auto-detection to content.js
-```
-
 ### Best Practice
 - **Small commits** with single features
 - **Brief descriptions** that explain what was done
 - **Avoid essay-length** commit messages
 - **Less is more** - let the code diff speak
 
-## Design Philosophy Summary
-
-1. **Simplicity Over Complexity**: Always choose the simpler solution
-2. **Function Over Class**: Use functions, avoid object-oriented complexity
-3. **LLM Intelligence**: Let the AI do the work instead of writing complex code
-4. **Minimal Viable Product**: Core functionality only, no bells and whistles
-5. **Maintainability**: Less code = fewer bugs = easier maintenance
-
-**Key Insight**: Modern LLMs are powerful enough to handle noisy input, eliminating the need for complex preprocessing algorithms.
-
-**Remember**: When in doubt, choose simplicity. The llm-proxy (87 lines) is the gold standard for this codebase's philosophy.

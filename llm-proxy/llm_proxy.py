@@ -10,6 +10,7 @@ from urllib.parse import urljoin
 import httpx
 import typer
 import uvicorn
+import traceback
 from fastapi import FastAPI, Request
 from fastapi.responses import Response
 from zign.api import get_token
@@ -56,9 +57,9 @@ async def proxy_request(request: Request, path: str):
                 status_code=response.status_code,
                 headers=dict(response.headers),
             )
-        except Exception as e:
-            print(f"Error: {e}")
-            return Response(f"Proxy error: {e}", status_code=502)
+        except Exception:
+            traceback.print_exc()
+            return Response(f"Proxy error: {traceback.format_exc()}", status_code=502)
 
 
 def main(

@@ -2,10 +2,10 @@
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'getContent') {
         // Try selection first, fallback to full page
-        let content = window.getSelection().toString().trim();
+        let content = window.getSelection().toString() || document.body.innerText;
 
         if (!content) {
-            content = document.body.textContent || document.body.innerText || '';
+            content =  'Error: No content found; try select the page.';
         }
 
         // Basic cleanup - remove excessive whitespace

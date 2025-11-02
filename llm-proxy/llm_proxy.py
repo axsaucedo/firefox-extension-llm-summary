@@ -39,6 +39,7 @@ async def proxy_request(request: Request, path: str):
 
     # Get request body
     body = await request.body()
+    print(f"Request: {request.method} {target} | Body: {body[:100] if body else 'None'}")
 
     # Forward request
     async with httpx.AsyncClient() as client:
@@ -49,12 +50,14 @@ async def proxy_request(request: Request, path: str):
                 headers=headers,
                 content=body,
             )
+            print(f"Response: {response.status_code} | Content: {response.content[:100] if response.content else 'None'}")
             return Response(
                 content=response.content,
                 status_code=response.status_code,
                 headers=dict(response.headers),
             )
         except Exception as e:
+            print(f"Error: {e}")
             return Response(f"Proxy error: {e}", status_code=502)
 
 

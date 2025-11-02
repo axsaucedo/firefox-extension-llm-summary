@@ -40,7 +40,7 @@ async def proxy_request(request: Request, path: str):
 
     # Get request body
     body = await request.body()
-    print(f"Request: {request.method} {target} | Body: {body[:100] if body else 'None'}")
+    print(f"Request: {request.method} {target} | Body: {body[:1000] if body else 'None'}")
 
     # Forward request
     async with httpx.AsyncClient() as client:
@@ -51,7 +51,7 @@ async def proxy_request(request: Request, path: str):
                 headers=headers,
                 content=body,
             )
-            print(f"Response: {response.status_code} | Content: {response.content[:100] if response.content else 'None'}")
+            print(f"Response: {response.status_code} | Content: {response.content[:1000] if response.content else 'None'}")
             return Response(
                 content=response.content,
                 status_code=response.status_code,

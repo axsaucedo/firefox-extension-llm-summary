@@ -30,14 +30,12 @@ async function summarize() {
     resultDiv.textContent = '';
 
     try {
-        // Get content from current tab
+        // Get content from current tab (auto-detect selection vs full page)
         const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-        const contentType = document.querySelector('input[name="content"]:checked').value;
         const prompt = document.getElementById('prompt').value || 'Summarize this content:';
 
         const response = await browser.tabs.sendMessage(tab.id, {
-            action: 'getContent',
-            type: contentType
+            action: 'getContent'
         });
 
         if (!response?.content) {

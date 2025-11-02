@@ -1,11 +1,10 @@
-// Minimal content extraction - let LLM handle the filtering
+// Auto-detect selection vs full page content
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'getContent') {
-        let content = '';
+        // Try selection first, fallback to full page
+        let content = window.getSelection().toString().trim();
 
-        if (message.type === 'selected') {
-            content = window.getSelection().toString().trim();
-        } else {
+        if (!content) {
             content = document.body.textContent || document.body.innerText || '';
         }
 

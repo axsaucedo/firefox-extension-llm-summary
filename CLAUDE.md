@@ -2,6 +2,28 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## KEEP IT SIMPLE Philosophy
+
+**CRITICAL**: This codebase follows a radical simplification philosophy. When users request changes with phrases like "KEEP IT SIMPLE", "minimal", "simple", or similar language, they are explicitly requesting:
+
+1. **Minimal Code Changes**: Add only 1-2 lines of code maximum
+2. **No Over-Engineering**: Avoid complex algorithms, classes, or elaborate solutions
+3. **Function-Based Approach**: Use simple functions, not classes or frameworks
+4. **Minimal UI Changes**: Basic functionality over fancy interfaces
+5. **LLM-Proxy Principle**: Follow the same simplicity as llm_proxy.py (87 lines total)
+
+### Examples of KEEP IT SIMPLE:
+- **Good**: `print(f"Debug: {data}")` (1 line)
+- **Bad**: Comprehensive logging framework with multiple levels and formatters (100+ lines)
+
+- **Good**: `content = selection || body.innerText` (auto-detection in 1 line)
+- **Bad**: Complex heuristic algorithms with scoring and multiple fallback layers
+
+- **Good**: Three input fields for settings
+- **Bad**: Comprehensive settings management with import/export, validation, categories
+
+**Remember**: The entire extension was reduced from 1,597 lines to 150 lines. Maintain this simplicity.
+
 ## Development Commands
 
 ### Core Workflow
@@ -21,231 +43,196 @@ npm run test:watch                          # Watch mode for tests
 npm test -- --coverage                     # Run with coverage report
 ```
 
-## Firefox Extension Architecture
+## Current Simplified Architecture
 
-### Component Communication Flow
-The extension uses a multi-component architecture where each component has specific responsibilities:
+### Component Overview (150 total lines)
+The extension uses a **minimal, function-based architecture**:
 
-- **Background Script** (`background/background.js`): Extension lifecycle, context menus, message routing
-- **Popup** (`popup/popup.js`): Main UI controller with view management (main → summarise/options)
-- **Options Page** (`options/options.js`): Settings management with import/export and validation
-- **Content Script** (`content-scripts/content.js`): Web page content extraction with smart filtering
+- **Popup** (`popup/popup.js` - 68 lines): Simple functions, no classes, single view
+- **Content Script** (`content-scripts/content.js` - 16 lines): Auto-detect selection vs full page
+- **Background Script** (`background/background.js` - 22 lines): Basic context menu only
+- **Options Page** (`options/options.js` - 41 lines): Minimal 3-field settings
 
-### Inter-Component Communication
-Components communicate via `browser.runtime.sendMessage()` patterns:
+### Simplified Communication
 ```javascript
-// Popup → Content Script (via tabs.sendMessage)
-browser.tabs.sendMessage(tabId, { action: 'getContent', type: 'selected' })
+// Content extraction (auto-detection)
+browser.tabs.sendMessage(tabId, { action: 'getContent' })
 
-// Background handles message routing and storage operations
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    // Message routing logic
-})
+// Simple response
+{ content: selectedText || fullPageText }
 ```
 
-### Storage Architecture
-Uses `browser.storage.sync` for cross-device settings persistence:
-- **Settings Object**: `{ apiUrl, model, headers, defaultSummaryPrompt, requestTimeout, autoCopyResults }`
-- **Saved Prompts**: Stored separately as `savedPrompt` key
-- **Storage requires explicit addon ID** in manifest for temporary extensions
+### Minimal Storage
+```javascript
+// Only 3 settings stored
+{ apiUrl, model, timeout }
+```
 
 ### Content Extraction Strategy
-Smart content extraction prioritizes:
-1. Article containers (`article`, `[role="main"]`, `main`)
-2. Content-specific selectors (`.content`, `.post-content`, etc.)
-3. Fallback to filtered body content
-4. Removes navigation, ads, scripts, styles automatically
+**Philosophy**: Let the LLM handle content filtering instead of complex code.
+
+```javascript
+// Simple approach: try selection first, fallback to full page
+let content = window.getSelection().toString() || document.body.innerText;
+```
+
+**Previous complex approach** (490 lines) was replaced with this **simple approach** (16 lines).
 
 ## Build System (Webpack)
 
 ### Entry Points & Output Structure
 ```javascript
 entry: {
-    popup: './popup/popup.js',      // → dist/popup/popup.js
-    options: './options/options.js', // → dist/options/options.js
-    background: './background/background.js', // → dist/background/background.js
-    content: './content-scripts/content.js'   // → dist/content-scripts/content.js
+    popup: './popup/popup.js',           // → dist/popup/popup.js (68 lines)
+    options: './options/options.js',     // → dist/options/options.js (41 lines)
+    background: './background/background.js', // → dist/background/background.js (22 lines)
+    content: './content-scripts/content.js'   // → dist/content-scripts/content.js (16 lines)
 }
 ```
-
-### Extension-Specific Configuration
-- **No code splitting** (`splitChunks: false`) for extension compatibility
-- **Copy static assets** (HTML, CSS, manifest.json, icons) to dist/
-- **Browser API externals** (`'webextension-polyfill': 'browser'`)
-- **Source maps** in development, minification in production
 
 ## Testing Architecture
 
 ### Browser API Mocking Strategy
 Complete mock setup in `tests/setup.js` provides:
-- **Storage APIs** (`browser.storage.sync`, `browser.storage.local`)
+- **Storage APIs** (`browser.storage.sync`)
 - **Runtime APIs** (`browser.runtime.onMessage`, `browser.tabs.sendMessage`)
-- **Extension APIs** (`browser.contextMenus`, `browser.notifications`)
-- **Web APIs** (`fetch`, `navigator.clipboard`, `TextEncoder/TextDecoder`)
+- **Extension APIs** (`browser.contextMenus`)
+- **Web APIs** (`fetch`, `navigator.clipboard`)
 
-### Test Helper Patterns
-```javascript
-// Mock settings creation
-const settings = createMockSettings({ model: 'custom-model' });
-
-// Mock API responses
-fetch.mockImplementation(() => createMockAPIResponse('Summary text'));
-
-// Browser storage mocking
-browser.storage.sync.get.mockResolvedValue({ llmSettings: settings });
-```
-
-### Testing Limitations
-Unit tests cover logic and API interactions, but **manual testing required** for:
-- Firefox extension loading and permissions
-- Browser integration and UI interactions
-- End-to-end workflows with real LLM APIs
-- Content extraction across different websites
+### Test Coverage
+**Important**: Tests maintain comprehensive coverage despite simplified code. The test suite is the only component that retains complexity to ensure all functionality works correctly.
 
 ## Key Development Patterns
 
-### Class-Based Component Architecture
-Each major component uses a class-based pattern:
+### Function-Based Architecture
 ```javascript
-class PopupController {
-    constructor() {
-        this.settings = { /* defaults */ };
-        this.initializeElements();  // DOM binding
-        this.bindEvents();         // Event handlers
-        this.loadSettings();       // Async initialization
-    }
-}
+// Simple function approach (current)
+async function loadSettings() { /* ... */ }
+async function summarize() { /* ... */ }
+
+// Avoid class-based approach (previous)
+class PopupController { /* complex implementation */ }
 ```
 
-### View Management Pattern (Popup)
-Single-page application pattern with view switching:
-```javascript
-showView(viewName) {
-    // Hide all views, show target view
-    // Update currentView state
-}
+### Minimal UI Pattern
+```html
+<!-- Single view, no navigation -->
+<div class="container">
+    <h3>LLM Utilities</h3>
+    <textarea id="prompt">Summarize this content:</textarea>
+    <button id="summarize-btn">Summarize</button>
+    <div id="result"></div>
+    <button id="options-btn">Settings</button>
+</div>
 ```
 
-### Settings Management Pattern
-Consistent pattern across components:
-1. **Load** settings from `browser.storage.sync`
-2. **Validate** input with proper error handling
-3. **Save** with user feedback
-4. **Export/Import** for backup functionality
-
-### API Integration Pattern
-OpenAI-compatible request format:
+### Simple Settings Management
 ```javascript
-{
-    model: settings.model,
-    messages: [{ role: 'user', content: `${prompt}\n\n${content}` }]
-}
+// Minimal 3-field settings
+const settings = { apiUrl, model, timeout };
+await browser.storage.sync.set({ llmSettings: settings });
+```
+
+## LLM Proxy Component
+
+### Simple Authentication Proxy (87 lines)
+```python
+# llm-proxy/llm_proxy.py - Minimal proxy for zign authentication
+@app.api_route("/{path:path}", methods=["GET", "POST", ...])
+async def proxy_request(request: Request, path: str):
+    headers["Authorization"] = f"Bearer {TOKEN}"
+    # Forward request with auth
+```
+
+### Debug Output (Simple)
+```python
+# Simple debugging (2 lines maximum)
+print(f"Request: {method} {target} | Body: {body[:100]}")
+print(f"Response: {status} | Content: {content[:100]}")
 ```
 
 ## Firefox Extension Specifics
 
 ### Manifest V2 Requirements
-- **Explicit addon ID needed** for storage API in temporary extensions
-- **Content Security Policy** prevents inline scripts
-- **Permissions**: `activeTab`, `storage`, `http://localhost/*` for local APIs
+- **Minimal Permissions**: `activeTab`, `storage`, `http://localhost/*`
+- **No Complex CSP**: Simple inline restrictions only
+- **Basic Icons**: Standard 16x16, 32x32, 48x48, 128x128
 
 ### Loading for Development
-1. Build extension: `npm run build`
-2. Firefox: `about:debugging` → "This Firefox" → "Load Temporary Add-on"
+1. Build: `npm run build`
+2. Firefox: `about:debugging` → "Load Temporary Add-on"
 3. Select `dist/manifest.json`
-4. **Add explicit gecko ID** to manifest if storage errors occur
-
-### Icon Requirements
-Extension references PNG icons that must be created from `popup/icons/icon.svg`:
-- 16x16, 32x32, 48x48, 128x128 pixel versions
-- See `create-icons.md` for conversion instructions
 
 ## API Configuration
 
-### Required API Format
+### Simple API Format
 Extension expects OpenAI-compatible endpoints:
-```bash
+```javascript
 POST /v1/chat/completions
-Content-Type: application/json
-{ "model": "...", "messages": [...] }
+{
+  "model": "openai/gpt-4o",
+  "messages": [{"role": "user", "content": "Summarize: ..."}]
+}
 ```
 
-### LLM Proxy Component
-The repository includes an `llm-proxy/` component - a Python HTTP proxy that adds zign authentication headers:
-
-**Purpose**: Enables authentication with external LLM APIs that require tokens extracted via `zign.api.get_token()`
-
-**Usage**:
-```bash
-cd llm-proxy
-uv sync
-uv run llm-proxy serve https://api.anthropic.com --port 4000
-```
-
-**Extension Configuration**: Set API endpoint to `http://localhost:4000/v1/chat/completions`
-
-**Architecture**: FastAPI + httpx async proxy with token caching and transparent request forwarding
-
-### Common API Configurations
-- **With LLM Proxy**: `http://localhost:4000/v1/chat/completions` (proxy handles auth)
-- **Direct APIs**: `https://api.openai.com/v1/chat/completions` (requires auth headers)
-- **Model names**: `openai/gpt-4o`, `claude-3-sonnet`, or custom model identifiers
+### Common Configurations
+- **With LLM Proxy**: `http://localhost:4000/v1/chat/completions`
+- **Direct APIs**: `https://api.openai.com/v1/chat/completions`
+- **Models**: `openai/gpt-4o`, `claude-3-sonnet`
 
 ## Git Commit Requirements
 
-**CRITICAL**: This is an active git repository. Every modification must include detailed git commits:
-
-### Commit Guidelines
-- **Always commit changes** after completing logical units of work
-- **Detailed commit messages** explaining what was changed and why
-- **Separate commits** for different types of changes (features, fixes, documentation)
-- **Include file-specific details** in commit messages
+**CRITICAL**: KEEP IT SIMPLE applies to commits too. Be concise and precise.
 
 ### Commit Message Format
 ```
-<type>: <short description>
+<type>: brief description of what was done
 
-- Detailed explanation of what was changed
-- Why the change was necessary
-- Any breaking changes or considerations
-- Files modified: path/to/file1.js, path/to/file2.css
+Optional bullet points for multiple changes only.
 ```
 
-### Example Commits
-```bash
-git add popup/popup.js popup/popup.css
-git commit -m "feat: add dark mode toggle to popup interface
-
-- Added dark mode state management in PopupController
-- Updated CSS with dark theme variables and transitions
-- Added toggle button in main view with localStorage persistence
-- Files modified: popup/popup.js, popup/popup.css"
-
-git add llm-proxy/llm_proxy.py
-git commit -m "fix: resolve global variable scope issue in proxy
-
-- Added explicit global declarations for TARGET_URL and TOKEN
-- Fixes proxy configuration not being accessible to request handler
-- Ensures authentication headers are properly added to requests
-- Files modified: llm-proxy/llm_proxy.py"
+### Good Examples (Simple)
+```
+feat: add debug prints to llm-proxy
+fix: auto-detect selection vs full page
+docs: update README for simplified architecture
 ```
 
-### When to Commit
-- After implementing a complete feature
-- After fixing bugs or issues
-- After updating documentation
-- Before major refactoring
-- When requested by user for specific changes
+### Bad Examples (Over-Explained)
+```
+feat: implement comprehensive multi-layered content extraction system
 
-## Manual Testing Workflow
+Replace hardcoded selector approach with intelligent, adaptive content detection
+system that handles modern web architectures and diverse site structures.
 
-Essential testing steps due to browser extension environment:
-1. **Build and load** extension in Firefox
-2. **Configure API** endpoint in options page
-3. **Test content extraction** on various websites
-4. **Verify summarization** with real API endpoints
-5. **Test error handling** (network failures, API errors)
-6. **Check context menu integration**
-7. **Validate settings persistence** across browser sessions
+## New Multi-Layered Architecture:
+[... 50 lines of explanation ...]
+```
 
-The extension includes comprehensive manual testing workflows in `README.md` with specific test cases and expected behaviors.
+### When to Use Bullet Points
+Only when multiple distinct changes are made:
+```
+feat: simplify popup interface
+
+- Remove radio buttons from HTML
+- Update CSS to remove radio styles
+- Add auto-detection to content.js
+```
+
+### Best Practice
+- **Small commits** with single features
+- **Brief descriptions** that explain what was done
+- **Avoid essay-length** commit messages
+- **Less is more** - let the code diff speak
+
+## Design Philosophy Summary
+
+1. **Simplicity Over Complexity**: Always choose the simpler solution
+2. **Function Over Class**: Use functions, avoid object-oriented complexity
+3. **LLM Intelligence**: Let the AI do the work instead of writing complex code
+4. **Minimal Viable Product**: Core functionality only, no bells and whistles
+5. **Maintainability**: Less code = fewer bugs = easier maintenance
+
+**Key Insight**: Modern LLMs are powerful enough to handle noisy input, eliminating the need for complex preprocessing algorithms.
+
+**Remember**: When in doubt, choose simplicity. The llm-proxy (87 lines) is the gold standard for this codebase's philosophy.
